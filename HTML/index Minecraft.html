@@ -1,0 +1,137 @@
+<html>
+
+<meta charset="utf-8" />
+<title>VortexPlay - Minecraft</title>
+<link rel="icon" type="image/png" href="/Img/Logo.png">
+<link rel="stylesheet" href="/CSS/nav.css">
+</head>
+<body>
+  <style>
+    body{
+      background-color: #1f2029;
+      background: radial-gradient(ellipse at bottom, #1B2735 0%, #12141d 100%);
+    }
+    main{
+      margin-left: 20% !important;
+      max-width: 50%;
+      margin: 100px;
+      margin-top: 125px;
+    }
+  </style>
+  <header class="nav">
+    <div class="navbar">
+      <img id="logo" src="/Img/Logo VortexPlay.png">
+        <a href="/index.html">Inicio</a>
+        <a href="HTML/index Jugar.html">Jugar</a>
+        <a href="HTML/index Login.html">Log In</a>
+    </div>
+</header>
+<main>
+  <div class="sec">
+<div class="row">
+<canvas class="emscripten" id="canvas" style="background-color: black;" oncontextmenu="event.preventDefault()" tabindex="-1" width="1000" height="562"></canvas>
+<span id="logmsg" style="color:#F67;"></span>
+</div>
+</div>
+</main>
+
+<script type="text/javascript">
+    function logText(text) { 
+      console.log(text);
+      var logElement = document.getElementById('logmsg');
+      logElement.innerHTML = text;
+    }
+
+
+    var idb = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    if (!idb) { alert('IndexedDB unsupported, therefore\nmaps and settings will not save');window.mozIndexedDB = {}; }
+
+    function preloadIndexedDB() { _interop_LoadIndexedDB(); }
+    
+    function forceTouchLayout() {
+      var elem;
+      try {
+        elem = document.getElementById('footer');
+        elem.parentNode.removeChild(elem);
+        elem = document.getElementById('content');
+        elem.parentNode.removeChild(elem);
+      } catch (err) { }
+    }
+    
+    function getCssInt(styles, prop) { return parseInt(styles.getPropertyValue(prop), 10); }
+    function calcViewportWidth(elem) {
+      var parent = elem.parentNode;
+      var styles = window.getComputedStyle(parent, null);
+      return parent.offsetWidth - getCssInt(styles, 'padding-left') - getCssInt(styles, 'padding-right');
+    }
+
+    function resizeGameCanvas() {
+      var cc_canv = document.getElementById('canvas');
+      var dpi = window.devicePixelRatio;
+      var aspect_ratio = 16/9;
+
+      var viewport_w = calcViewportWidth(cc_canv);
+      var viewport_h = viewport_w / aspect_ratio;
+
+      var canv_w = Math.round(viewport_w);
+      var canv_h = Math.round(viewport_h);
+
+      if (canv_h % 2) { canv_h = canv_h - 1; }
+      if (canv_w % 2) { canv_w = canv_w - 1; }
+
+      cc_canv.width  = canv_w * dpi;
+      cc_canv.height = canv_h * dpi;
+    }
+    
+    function logFatal(event) {
+      Module.setStatus('ClassiCube has crashed (' + event + ')\nPlease report this on the ClassiCube forums or to UnknownShadow200\n\nTo see more details, open Developer Tools and go to Console tab');
+      Module.setStatus = function(text) {
+        if (event) Module.printErr('[post-exception status] ' + event);
+      };
+    }
+    
+    var Module = {
+      preRun: [ preloadIndexedDB, resizeGameCanvas ],
+      postRun: [],
+      arguments: ['Singleplayer'],
+      print: function(text) {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+          console.log(text);
+      },
+      printErr: function(text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        console.error(text);
+      },
+      canvas: (function() {
+        return document.getElementById('canvas');
+      })(),
+      setStatus: logText,
+      totalDependencies: 0,
+      monitorRunDependencies: function(left) {
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+      },
+      onAbort: function(why) { logFatal('abort: ' + why); }
+    };
+
+    Module.setStatus('Downloading...');
+    window.onerror = function(event) { logFatal(event); };
+
+    function onDownloadFailed(src) {
+      // retry without CORS
+      logText('Failed to download ClassiCube.js, retrying..');
+      var root = src.parentNode;
+      root.removeChild(src);
+
+      var elem = document.createElement('script');
+      elem.setAttribute('async', '');
+      elem.setAttribute('src', '//cdn.classicube.net/client/latest/ClassiCube.js?v=20');
+      root.appendChild(elem);
+  }
+</script>
+<script async crossorigin type="text/javascript" src="//cdn.classicube.net/client/latest/ClassiCube.js?v=20" onerror="onDownloadFailed(this)"></script>
+<script> document.getElementById("logo").addEventListener("click", function() {window.location.href = "/index.html";});</script>
+</div>
+</div>
+</body>
+</html>
